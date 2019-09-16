@@ -1,0 +1,95 @@
+<IfModule mod_php5.c>
+
+############################################
+## adjust memory limit
+
+    php_value memory_limit 64M
+
+
+############################################
+## disable magic quotes for php request vars
+
+    php_flag magic_quotes_gpc off
+
+############################################
+## enable resulting html compression
+
+    php_flag zlib.output_compression on
+
+###########################################
+# turn off compatibility with PHP4 when dealing with objects
+
+    php_flag zend.ze1_compatibility_mode Off
+
+</IfModule>
+
+<IfModule mod_deflate.c>
+
+############################################
+## enable apache served files compression
+## http://developer.yahoo.com/performance/rules.html#gzip
+
+	# Insert filters / compress text, html, javascript, css, xml:
+	AddOutputFilterByType DEFLATE text/plain
+	AddOutputFilterByType DEFLATE text/html
+	AddOutputFilterByType DEFLATE text/xml
+	AddOutputFilterByType DEFLATE text/css
+	AddOutputFilterByType DEFLATE text/vtt 
+	AddOutputFilterByType DEFLATE text/x-component
+	AddOutputFilterByType DEFLATE application/xml
+	AddOutputFilterByType DEFLATE application/xhtml+xml
+	AddOutputFilterByType DEFLATE application/rss+xml
+	AddOutputFilterByType DEFLATE application/js
+	AddOutputFilterByType DEFLATE application/javascript
+	AddOutputFilterByType DEFLATE application/x-javascript
+	AddOutputFilterByType DEFLATE application/x-httpd-php
+	AddOutputFilterByType DEFLATE application/x-httpd-fastphp
+	AddOutputFilterByType DEFLATE application/atom+xml 
+	AddOutputFilterByType DEFLATE application/json
+	AddOutputFilterByType DEFLATE application/ld+json 
+	AddOutputFilterByType DEFLATE application/vnd.ms-fontobject 
+	AddOutputFilterByType DEFLATE application/x-font-ttf 
+	AddOutputFilterByType DEFLATE application/x-web-app-manifest+json 
+	AddOutputFilterByType DEFLATE font/opentype 
+	AddOutputFilterByType DEFLATE image/svg+xml
+	AddOutputFilterByType DEFLATE image/x-icon 
+	
+	SetEnvIfNoCase REQUEST_URI \.(?:gif|jpg|jpeg|png|svg)$ no-gzip dont-vary
+
+    # Netscape 4.x has some problems...
+    BrowserMatch ^Mozilla/4 gzip-only-text/html
+
+    # Netscape 4.06-4.08 have some more problems
+    BrowserMatch ^Mozilla/4\.0[678] no-gzip
+
+    # MSIE masquerades as Netscape, but it is fine
+    BrowserMatch \bMSIE !no-gzip !gzip-only-text/html
+
+    # Make sure proxies don't deliver the wrong content
+    Header append Vary User-Agent env=!dont-vary
+
+</IfModule>
+
+<IfModule mod_rewrite.c>
+
+############################################
+## enable rewrites
+
+    Options +FollowSymLinks
+    RewriteEngine on
+
+    RewriteBase /advisor/
+
+############################################
+## never rewrite for existing files, directories and links
+
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-l
+
+############################################
+## rewrite everything else to index.php
+
+    RewriteRule .* index.php [L]
+
+</IfModule>
